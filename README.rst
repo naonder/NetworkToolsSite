@@ -27,7 +27,8 @@ Setup
 Screenshots
 -----------
 .. image:: /images/main_menu.png
-  :width: 300
+   :width: 100
+   :height: 100
 .. image:: /images/device_select.png
 .. image:: /images/interface_select.png
 .. image:: /images/port_type_select.png
