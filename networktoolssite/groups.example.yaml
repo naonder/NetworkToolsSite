@@ -1,0 +1,23 @@
+---
+l3_devices_ios:
+    platform: ios
+l3_devices_nxos:
+    platform: nxos
+l2_devices_ios:
+    platform: ios
+l2_devices_nxos:
+    platform: nxos
+l2_access_devices_ios:
+    platform: ios
+l2_access_devices_nxos:
+    platform: nxos
+l3_core_switches_ios:
+    platform: ios
+l3_core_switches_nxos:
+    platform: nxos
+l3_routers_ios:
+    platform: ios
+l3_edge_routers_ios:
+    platform: ios
+l3_dc_routers_ios:
+    platform: ios

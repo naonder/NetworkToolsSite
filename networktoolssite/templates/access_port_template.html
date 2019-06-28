@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>.inv {
+    display: none;
+}</style>
+    <label for="port_type">Configure what type of port?</label>
+    <select id="port_type" name ="port_type">
+      <option value="None">None</option>
+      <option value="user_port">User Port</option>
+      <option value="printer_port">Printer Port</option>
+      <option value="camera_port">Camera Port</option>
+    </select>
+      <form id="user_port" class="inv" action="{{ url }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="port_type" value=user_port>
+        <p>
+          <label for="user_interface_select">Select an interface</label>
+          <select id="user_interface_select" name="interface_select">
+            {% for interface in template_interfaces %}
+            <option value="{{ interface }}">{{ interface }}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p>
+          <label for="user_access_select">Choose an access VLAN</label>
+          <select id="user_access_select" name= "access_select">
+            {% for vlan in vlans %}
+            <option value={{ vlan }}>{{ vlan }}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p>
+          <label for="user_voice_select">Choose a voice VLAN (leave at None if one is not needed)</label>
+          <select id="user_voice_select" name= "voice_select">
+          <option value="None">None</option>
+          {% for vlan in vlans %}
+          <option value={{ vlan }}>{{ vlan }}</option>
+          {% endfor %}
+          </select>
+        </p>
+        <p>
+          <label for="user_interface_description">Input an interface description</label>
+          <input type="text" id="user_interface_description" name="interface_description" maxlength="30" required>
+        </p>
+        <p><input type="submit" name="user_port_submit" value="Submit"></p>
+      </form>
+      <form id="printer_port" class="inv" action="{{ url }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="port_type" value=printer_port>
+        <p>
+          <label for="printer_interface_select">Select an interface</label>
+          <select id="printer_interface_select" name="interface_select">
+            {% for interface in template_interfaces %}
+            <option value="{{ interface }}">{{ interface }}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p>
+          <label for="printer_access_select">Choose an access VLAN</label>
+          <select id="printer_access_select" name = "access_select">
+            {% for vlan in vlans %}
+            <option value={{ vlan }}>{{ vlan }}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p>
+          <label for="printer_interface_description">Input an interface description</label>
+          <input type="text" id="printer_interface_description" name="interface_description" maxlength="30" required>
+        </p>
+        <p><input type="submit" name="printer_port_submit" value="Submit"></p>
+      </form>
+      <form id="camera_port" class="inv" action="{{ url }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="port_type" value=camera_port>
+        <p>
+          <label for="camera_interface_select">Select an interface</label>
+          <select id="camera_interface_select" name="interface_select">
+            {% for interface in template_interfaces %}
+            <option value="{{ interface }}">{{ interface }}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p>
+          <label for="camera_access_select">Choose an access VLAN</label>
+          <select id="camera_access_select" name ="access_select">
+            {% for vlan in vlans %}
+            <option value={{ vlan }}>{{ vlan }}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p>
+          <label for="camera_interface_description">Input an interface description</label>
+          <input type="text" id="camera_interface_description" name="interface_description" maxlength="30" required>
+        </p>
+        <p><input type="submit" value="Submit"></p>
+      </form>
+
+  <script>
+      document
+          .getElementById('port_type')
+          .addEventListener('change', function () {
+              'use strict';
+              var vis = document.querySelector('.vis'),
+                  target = document.getElementById(this.value);
+              if (vis !== null) {
+                  vis.className = 'inv';
+              }
+              if (target !== null ) {
+                  target.className = 'vis';
+              }
+      });
+  </script>
+{% endblock %}

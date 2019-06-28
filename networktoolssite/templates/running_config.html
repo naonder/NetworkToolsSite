@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+<body>
+<p>Current configuration of {{ running_interface }}.</p>
+<hr>
+<span style="white-space: pre-line">{{ template_config }}</span>
+{% endblock %}

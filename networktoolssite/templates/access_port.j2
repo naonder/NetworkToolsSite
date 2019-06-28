@@ -1,0 +1,46 @@
+interface {{ interface }}
+description {{ description }}
+switchport mode access
+switchport access vlan {{ access_vlan }}
+{% if voice_vlan %}
+switchport voice vlan {{ voice_vlan }}
+{% endif %}
+switchport nonegotiate
+{% if port_type == 'user_port' %}
+switchport port-security
+switchport port-security maximum 3
+switchport port-security aging time 2
+switchport port-security violation restrict
+switchport port-security aging type inactivity
+{% elif port_type == 'camera_port' or port_type == 'printer_port' %}
+switchport port-security
+switchport port-security mac-address sticky
+switchport port-security aging time 2
+switchport port-security violation restrict
+switchport port-security aging type inactivity
+{% endif %}
+{% if port_type == 'printer_port' %}
+power inline never
+{% elif port_type == 'user_port' %}
+power inline auto max 16000
+{% endif %}
+storm-control broadcast level 1.00
+storm-control multicast level 1.00
+storm-control action trap
+spanning-tree portfast
+spanning-tree bpduguard enable
+no logging event link-status
+no snmp trap link-status
+snmp trap mac-notification change added
+snmp trap mac-notification change removed
+{% if port_type != server_port %}
+srr-queue bandwidth share 1 30 35 5
+priority-queue out
+mls qos trust dscp
+service-policy input INGRESS-POLICE-1G
+service-policy output EGRESS-POLICE-1G
+mls qos trust device cisco-phone
+ip dhcp snooping limit rate 15
+shutdown
+no shutdown
+{% endif %}

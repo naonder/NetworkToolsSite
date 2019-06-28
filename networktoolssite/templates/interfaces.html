@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+  <form id="form2" action="{{ url }}" method="POST" enctype="multipart/form-data">
+    <label for="mySelect">Select an interface</label>
+    <select id="mySelect" name="Interface">
+      {% for interface in template_interfaces %}
+      <option value="{{ interface }}">{{ interface }}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

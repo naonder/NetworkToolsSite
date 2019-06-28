@@ -1,0 +1,7 @@
+---
+test-device:
+    hostname: 172.16.1.1
+    port: 22
+    groups:
+        - l2_devices_ios
+        - l2_access_devices_ios

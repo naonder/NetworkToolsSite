@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+  <form id="arp_select" action="{{ url }}" method="POST" enctype="multipart/form-data">
+    <label for="device_select">Select a device to check IP to MAC address mappings from:</label>
+    <select id="device_select" name="device_select">
+      {% for device in devices %}
+      <option value="{{ device }}">{{ device}}</option>
+      {% endfor %}
+    </select>
+    <p><label for="address_input">Input an IP or MAC address:</label>
+    <input type="text" id="address_input" name="address_input" maxlength="14" minlength="7" required>
+    <input type="submit" value="Submit">
+    </p>
+  </form>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <hr>
+    {% for message in messages %}
+      <p>{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+{% endblock %}

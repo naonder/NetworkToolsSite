@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+  <form id="form2" action="{{ url }}" method="POST" enctype="multipart/form-data">
+    <label for="myselect">Select a switch</label>
+    <select id="mySelect" name = "Switch">
+      {% for switch in template_switches %}
+      <option value="{{ switch }}">{{ switch }}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="Submit">
+  </form>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <hr>
+    {% for message in messages %}
+      <p>{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+{% endblock %}

@@ -1,0 +1,11 @@
+*.log
+venv
+*.egg-info
+dist/
+__pycache__
+*.pyc
+.idea
+_build
+groups.yaml
+hosts.yaml
+defaults.yaml

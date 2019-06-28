@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>.inv {
+    display: none;
+}</style>
+    <label for="clear_type">Clear a sticky MAC address or from an interface?</label>
+    <select id="clear_type" name ="clear_type">
+      <option value="None">None</option>
+      <option value="clear_sticky">Clear sticky MAC address</option>
+      <option value="clear_interface">Clear MAC address from interface</option>
+    </select>
+      <form id="clear_sticky" class="inv" action="{{ url }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="clear_type" value="clear_sticky">
+        <p>
+          <label for="sticky_mac_address">Input a MAC address to clear (use aaaa.bbbb.cccc for example)</label>
+          <input type="text" id="sticky_mac_address" name="sticky_mac_address" maxlength="14" minlength="14" required>
+        </p>
+        <p><input type="submit" name="clear_sticky_submit" value="Submit"></p>
+      </form>
+      <form id="clear_interface" class="inv" action="{{ url }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="clear_type" value="clear_interface">
+        <label for="sticky_interface">Select an interface</label>
+        <select id="sticky_interface" name="interface_select">
+        {% for interface in template_interfaces %}
+        <option value="{{ interface }}">{{ interface }}</option>
+        {% endfor %}
+        </select>
+        <p><input type="submit" name="clear_interface_submit" value="Submit"></p>
+      </form>
+
+  <script>
+      document
+          .getElementById('clear_type')
+          .addEventListener('change', function () {
+              'use strict';
+              var vis = document.querySelector('.vis'),
+                  target = document.getElementById(this.value);
+              if (vis !== null) {
+                  vis.className = 'inv';
+              }
+              if (target !== null ) {
+                  target.className = 'vis';
+              }
+      });
+  </script>
+
+{% endblock %}

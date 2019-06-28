@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if title %}
+    <title>{{ title }}</title>
+    {% endif %}
+</head>
+<body>
+<div>Network Tools: <a href="{{ url_for('index') }}">Back to main menu</a> </div>
+<h3><strong>DO NOT hit your browser's back button. Use the link for the main menu as needed.</strong></h3>
+<hr>
+{% block content %}{% endblock %}
+</body>
+</html>
