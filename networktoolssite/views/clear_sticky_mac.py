@@ -9,7 +9,7 @@ clear_sticky_mac_complete_blueprint = Blueprint('clear_sticky_mac_complete', __n
 @clear_sticky_mac_select_blueprint.route('/clearstickydeviceselect', methods=['GET', 'POST'])
 def clear_sticky_mac_select():  # Presents a dropdown of devices
     options = connection_functions.ConnectionMethods()
-    switches = options.get_all_switches()
+    switches = options.get_l2_devices()
 
     return render_template('switches.html', template_switches=switches,
                            url=url_for('clear_sticky_mac_option_select.clear_sticky_mac_option_select'))

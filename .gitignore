@@ -9,3 +9,4 @@ _build
 groups.yaml
 hosts.yaml
 defaults.yaml
+test.py

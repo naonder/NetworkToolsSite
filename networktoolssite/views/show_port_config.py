@@ -12,7 +12,7 @@ show_run_blueprint = Blueprint('interface_show_run', __name__)
 def dev_select():
     session.clear()
     options = connection_functions.ConnectionMethods()
-    switches = options.get_all_switches()
+    switches = options.get_l2_devices()
 
     return render_template('switches.html', template_switches=switches,
                            url=url_for('interface_select.interface_select'))

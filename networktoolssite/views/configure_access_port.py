@@ -12,7 +12,7 @@ configure_access_port_option_check_blueprint = Blueprint('configure_access_port_
 def configure_access_port_select():
     session.clear()
     options = connection_functions.ConnectionMethods()
-    switches = options.get_all_switches()
+    switches = options.get_l2_devices()
 
     return render_template('switches.html', template_switches=switches,
                            url=url_for('configure_access_port_option_select.configure_access_port_option_select'))

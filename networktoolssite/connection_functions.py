@@ -22,11 +22,14 @@ class ConnectionMethods(object):  # Left it as a class just because
         device = nr.filter(name=network_device)
         return device
 
-    def get_all_switches(self):  # Will return a list of all switches
+    def get_l2_devices(self):  # Will return a list of all switches
         with open('networktoolssite/hosts.yaml', 'r') as hosts:
-            dict_switches = yaml.safe_load(hosts)
-            all_switches = [device for device in dict_switches]
-        return all_switches
+            dict_devices = yaml.safe_load(hosts)
+            all_devices = [device for device, values in dict_devices.items()
+                           if values.get('groups', None)
+                           if 'l2_devices_ios' in values.get('groups') or 'l2_devices_nxos' in values.get('groups')]
+            sorted_devices = [switch for switch in all_devices]
+        return sorted_devices
 
     def get_arp_devices(self):  # Returns only layer3 devices from the hosts.yaml file
         with open('networktoolssite/hosts.yaml', 'r') as hosts:
@@ -34,19 +37,18 @@ class ConnectionMethods(object):  # Left it as a class just because
             l3_devices = [device for device, values in dict_devices.items()
                           if values.get('groups', None)
                           if 'l3_devices_ios' in values.get('groups') or 'l3_devices_nxos' in values.get('groups')]
-        return l3_devices
+            sorted_devices = [device for device in l3_devices]
+        return sorted_devices
 
     def get_interfaces(self, device, network_device):  # Returns a list of interfaces if the connection succeeds
-        result = device.run(task=networking.netmiko_send_command, command_string='sh int status')
-        interfaces = '\n'.join([interfaces.result for interfaces in result.values()])
+        result = device.run(task=networking.napalm_get, getters=['get_facts'])
+        full_entry = result[network_device][0].__dict__  # Converts result into a dictionary object
+        entries = full_entry['result']['get_facts']['interface_list']
+        skips = ['Port', 'Loopback', 'Vlan', 'mgmt', 'port', 'loopback']
         all_interfaces = []
-        for line in interfaces.splitlines():
-            try:
-                interface_name = line.split()[0]
-                if interface_name != 'Port':
-                    all_interfaces.append(interface_name)
-            except IndexError:
-                pass
+        for entry in entries:
+            if not any(x in entry for x in skips):
+                all_interfaces.append(entry)
         if result.failed:  # If connection fails, return True and let client know
             return result.get(network_device).exception, True
         else:
@@ -123,16 +125,21 @@ class ConnectionMethods(object):  # Left it as a class just because
                             command_string='clear port-security sticky interface {}'.format(interface))
         print_result(result)
 
-    def check_arp(self, device, address):  # Attempts to show ARP mapping for either IP or MAC address
-        result = device.run(task=networking.netmiko_send_command,
-                            command_string='sh ip arp {} | e Protocol'.format(address))
-        entry = '\n'.join([entry.result for entry in result.values()])
-        if entry:
-            ip_address, mac = entry.split()[1], entry.split()[-3]
-            return '{} maps to {}'.format(ip_address, mac)
-        else:
-            return 'No mapping found for {}. Check that device is online, address was correctly entered, ' \
-                   'and search is from correct device.'.format(address)
+    def check_arp(self, device, l3_device, address):  # Attempts to show ARP mapping for either IP or MAC address
+        result = device.run(task=networking.napalm_get, getters=['arp_table'])
+
+        full_entry = result[l3_device][0].__dict__  # Convert result for device getter into a dictionary object
+
+        entries = full_entry['result']['arp_table']  # Entries is a list of dictionaries of interface, address, mac
+        for entry in entries:
+            for k, v in entry.items():
+                if str(v) == address:
+                    if k == 'ip':
+                        return f"{address} maps to {entry['mac']}"
+                    elif k == 'mac':
+                        return f"{address} maps to {entry['ip']}"
+        return 'No mapping found for {}. Check that device is online, address was correctly entered, ' \
+               'and search is from correct device.'.format(address)
 
     def validate_format_mac(self, mac_address):  # Validates entered address is a valid MAC address
         dividers = '.-: '

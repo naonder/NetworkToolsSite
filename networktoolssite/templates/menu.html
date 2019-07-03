@@ -6,14 +6,14 @@
 </head>
 <body>
 <div><h2>Network Tools:</h2></div>
-<p>This site is inteded for those who need to configure a switchport or check a configuration</p>
+<p>This site is inteded for those who need to configure a switchport or other related functions</p>
 <hr>
 <div><h2>Select an option:</h2></div>
 <p><a href="{{ url_for('device_select.dev_select') }}">Check a port's configuration</a></p>
 <p><a href="{{ url_for('clear_sticky_mac_select.clear_sticky_mac_select') }}">Clear port security for a MAC address or on an interface</a></p>
 <p><a href="{{ url_for('configure_access_port_select.configure_access_port_select') }}">Configure an access port</a></p>
 <p><a href="{{ url_for('show_arp_select.show_arp_select') }}">Check an IP to MAC address mapping</a></p>
-<p><a href="/macaddresstrack">Track down a MAC address</a></p>
+<p><a href="/macaddresstrack">Track down a MAC address (NYI)</a></p>
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <hr>

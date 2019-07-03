@@ -27,6 +27,6 @@ def show_arp_result():  # Attempt to validate entered address then resolve the A
             return redirect(url_for('show_arp_select.show_arp_select'))
 
     device = options.base_settings(l3_device)
-    ip_mac_mapping = options.check_arp(device, address)
+    ip_mac_mapping = options.check_arp(device, l3_device, address)
     flash(ip_mac_mapping)
     return redirect(url_for('index'))
