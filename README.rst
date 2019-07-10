@@ -16,6 +16,7 @@ Notes
 
 | While Flask comes w/ a built-in server, you should use a production ready server
 | Also keep in mind this is in the early stages of development (not feature complete) so use is as-is
+| Finally - this requires Flask, Nornir, and TextFSM(see here - https://github.com/networktocode/ntc-templates)
 
 Setup
 -----
