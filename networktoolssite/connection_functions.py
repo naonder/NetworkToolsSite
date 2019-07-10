@@ -7,7 +7,7 @@ from nornir.plugins.tasks import networking
 from nornir.plugins.functions.text import print_result
 
 
-class ConnectionMethods(object):  # Left it as a class just because
+class ConnectionMethods(object):  # Left it as a class just because.
     def __init__(self):
         self.host_file = 'networktoolssite/hosts.yaml'
         self.defaults_file = 'networktoolssite/defaults.yaml'
@@ -22,7 +22,7 @@ class ConnectionMethods(object):  # Left it as a class just because
         device = nr.filter(name=network_device)
         return device
 
-    def get_l2_devices(self):  # Will return a list of all switches
+    def get_l2_devices(self):  # Will return a list of all layer2 devices - modify as needed based on groups/hosts
         with open('networktoolssite/hosts.yaml', 'r') as hosts:
             dict_devices = yaml.safe_load(hosts)
             all_devices = [device for device, values in dict_devices.items()
@@ -31,7 +31,7 @@ class ConnectionMethods(object):  # Left it as a class just because
             sorted_devices = [switch for switch in all_devices]
         return sorted_devices
 
-    def get_arp_devices(self):  # Returns only layer3 devices from the hosts.yaml file
+    def get_arp_devices(self):  # Returns only layer3 devices - modify as needed based on groups/hosts
         with open('networktoolssite/hosts.yaml', 'r') as hosts:
             dict_devices = yaml.safe_load(hosts)
             l3_devices = [device for device, values in dict_devices.items()
@@ -64,50 +64,38 @@ class ConnectionMethods(object):  # Left it as a class just because
         device.run(task=networking.netmiko_send_config, config_commands=['interface {}'.format(interface),
                                                                          'description {}'.format(description)])
 
-    def get_vlans(self, device):  # Will grab most VLANs from a device
-        result = device.run(task=networking.netmiko_send_command, command_string='sh vlan br | e Name|Status|Ports|---')
+    def get_vlans(self, l2_device, device):  # Will grab most VLANs from a device
+        result = device.run(task=networking.netmiko_send_command, command_string='sh vlan', use_textfsm=True)
 
-        vlans = '\n'.join([vlan.result for vlan in result.values()])
+        all_vlans_dict = {}
+        for key in result:
+            all_vlans_dict[key] = result[key][0].result
+        vlans = all_vlans_dict[l2_device]
         no_go_vlans = ['1002', '1003', '1004', '1005', 'Fa', 'Gi', 'Te', 'Po']
         all_vlans = []
-        for line in vlans.splitlines():
-            try:
-                vlan_id, vlan_name = line.split()[0], line.split()[1]
-                if not any(word in vlan_id for word in no_go_vlans):
-                    all_vlans.append(vlan_id + ' - ' + vlan_name)
-            except IndexError:
-                pass
+
+        for vlan in vlans:
+            if not any(word in vlan['vlan_id'] for word in no_go_vlans):
+                all_vlans.append(vlan['vlan_id'] + ' - ' + vlan['name'])
 
         return all_vlans
 
-    def check_cdp_neighbor(self, device, interface):  # Verifies a neighbor isn't another switch, router, or AP
+    def check_cdp_neighbor(self, l2_device, device, interface):  # Verifies a neighbor isn't another switch, router, or AP
         result = device.run(task=networking.netmiko_send_command,
-                            command_string='show cdp neighbors {} detail'.format(interface))
+                            command_string='show cdp neighbors detail', use_textfsm=True)
 
-        neighbors = '\n'.join([neighbors.result for neighbors in result.values()])
+        all_neighbors = {}
+        for key in result:
+            all_neighbors[key] = result[key][0].result
+        neighbors = all_neighbors[l2_device]
 
         if neighbors:
-
-            neighbor_entries = neighbors.split('------')
-
-            neighbor_list = []
-            for neighbor in neighbor_entries:
-                if neighbor != '':
-                    details = {}
-                    for line in neighbor.splitlines():
-                        if 'Device ID' in line:
-                            details['name'] = line.split(' ')[-1]
-                        if 'Platform' in line:
-                            details['capabilities'] = line.split(' ')[4:]
-                else:
-                    continue
-                neighbor_list.append(details)
-
             checks = ['Router', 'Switch', 'IGMP']
             return_neighbors = []
-            for neighbor in neighbor_list:
-                if any(word in checks for word in neighbor.get('capabilities')):
-                    return_neighbors.append(neighbor)
+            for neighbor in neighbors:
+                if neighbor['local_port'] == interface:
+                    if any(word in checks for word in neighbor['capabilities'].split()):
+                        return_neighbors.append(neighbor['destination_host'])
             return return_neighbors
 
     def push_configuration(self, device, interface, config):  # Will default an interface

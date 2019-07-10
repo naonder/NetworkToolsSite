@@ -10,3 +10,4 @@ groups.yaml
 hosts.yaml
 defaults.yaml
 test.py
+ntc-templates

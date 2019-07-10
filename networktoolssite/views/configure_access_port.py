@@ -29,7 +29,7 @@ def configure_access_port_option_select():
         flash('Connection attempt to {} failed, try again'.format(switch))
         return redirect(url_for('index'))
     else:
-        session['vlans'] = options.get_vlans(device)
+        session['vlans'] = options.get_vlans(switch, device)
         return render_template('access_port_template.html',
                                url=url_for('configure_access_port_option_check.configure_access_port_option_check'),
                                template_interfaces=all_interfaces, vlans=session.get('vlans'))
@@ -46,11 +46,11 @@ def configure_access_port_option_check():
     description = request.form.get('interface_description')
     session['interface'] = interface
     device = options.base_settings(switch)
-    neighbor_check = options.check_cdp_neighbor(device, interface)
+    neighbor_check = options.check_cdp_neighbor(switch, device, interface)
 
     if neighbor_check:
         for neighbor in neighbor_check:
-            flash('{} was detected on port {}. Select a different port'.format(neighbor.get('name'), interface))
+            flash('{} was detected on port {}. Select a different port'.format(neighbor, interface))
         return redirect(url_for('index'))
 
     else:
